@@ -1,5 +1,9 @@
 #include <iostream>
 #include <string>
+#include <array>
+#include <system_error>
+#include <vector>
+#include <mdspan>
 
 using namespace std;
 
@@ -9,6 +13,44 @@ string rgb(int r, int g, int b) {
 }
 
 const string reset = "\033[0m";
+
+
+// 7-segment display defined as follows
+// ----A----
+// |       |
+// B       C
+// |       |
+// |---D---|
+// |       |
+// E       F
+// |       |
+// |---G---|
+enum segment {
+  A = 1 << 0, // top
+  B = 1 << 1, // upper right
+  C = 1 << 2, // lower right
+  D = 1 << 3, // bottom
+  E = 1 << 4, // lower left
+  F = 1 << 5, // upper left
+  G = 1 << 6  // middle
+};
+
+// define the numbers and which segments are lit
+array<int, 10> digit_segments = {
+    A | B | C | C,
+    B | E,
+    A | C | D | E | G,
+    A | C | D | F | G,
+    B | C | D | F,
+    A | B | D | F | G,
+    A | B | D | E | F | G,
+    A | C | F,
+    A | B | C | D | E | F | G,
+    A | B | C | D | F | G
+};
+
+// number of rotational symmetries
+array<int,10> rotations = {1,2, 2, 4, 4, 2, 4, 4, 2, 4};
 
 
 string get_color(int entry) {
@@ -76,7 +118,6 @@ int the_board[9][6] = {
 };
 
 
-int rotations[10] = {1,2, 2, 4, 4, 2, 4, 4, 2, 4};
 
 int zero1[5][3] = {
     {0,-1,-1},
@@ -316,6 +357,29 @@ int nine4[5][3] = {
 //int rotations[10] = {1,2, 2, 4, 4, 2, 4, 4, 2, 4};
 
 
+// storage for the numbers, 10 numbers * 4 rotations * 5x3 size of the 7 segment display with 5 rows (3 vertical and 2 horizontal) and 3 columns
+vector<int> storage(10 * 4 * 5 * 3, -1);
+auto numbers = mdspan(storage.data(), 10, 4, 5, 3);
+
+void init_numbers() {
+    for (int number = 0; number < 10; number++) {
+        numbers[number, 0, 0, 0] = (digit_segments[number] & A) == 0 ? -1 : number;
+        numbers[number, 0, 1, 0] = (digit_segments[number] & B) == 0 ? -1 : number;
+        numbers[number, 0, 1, 1] = (digit_segments[number] & C) == 0 ? -1 : number;
+        numbers[number, 0, 2, 0] = (digit_segments[number] & D) == 0 ? -1 : number;
+        numbers[number, 0, 3, 0] = (digit_segments[number] & E) == 0 ? -1 : number;
+        numbers[number, 0, 3, 1] = (digit_segments[number] & F) == 0 ? -1 : number;
+        numbers[number, 0, 4, 0] = (digit_segments[number] & G) == 0 ? -1 : number;
+
+        for (int rotation = 1; rotation < rotations[number]; rotation++) {
+            // TODO: handle rotations
+
+        }
+    }
+}
+
+
+
 bool place_number(int number, int rotation, int row, int column) {
     bool success = true;
 
@@ -450,5 +514,14 @@ void find_solutions(int number) {
 
 
 int main() {
-    find_solutions(0);
+    // find_solutions(0);
+    init_numbers();
+    for (int i = 0; i < 5; i++) {
+        for (int j = 0; j < 3; j++) {
+            cout << numbers[9,0,i,j] << " ";
+        }
+        cout << endl;
+
+    }
+
 }
