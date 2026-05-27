@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
 #include <array>
-#include <system_error>
+#include <algorithm>
 #include <vector>
 #include <mdspan>
 
@@ -37,7 +37,7 @@ enum segment {
 
 // define the numbers and which segments are lit
 array<int, 10> digit_segments = {
-    A | B | C | C,
+    A | B | C | D,
     B | E,
     A | C | D | E | G,
     A | C | D | F | G,
@@ -55,54 +55,21 @@ array<int,10> rotations = {1,2, 2, 4, 4, 2, 4, 4, 2, 4};
 
 string get_color(int entry) {
     switch (entry) {
-    case -1:
-      return rgb(0, 0, 0);
-      break;
-    case 0:
-      return rgb(255, 0, 0);
-      break;
-    case 1:
-      return  rgb(255, 165, 0);
-      break;
-    case 2:
-      return rgb(255, 255, 0);
-      break;
-    case 3:
-      return rgb(144, 238, 144);
-      break;
-    case 4:
-      return rgb(0, 100, 0);
-      break;
-    case 5:
-      return rgb(0, 255, 255);
-      break;
-    case 6:
-        return rgb(70, 130, 180);
-        break;
-    case 7:
-        return rgb(30, 70, 200);
-        break;
-    case 8:
-      return rgb(148, 0, 211);
-      break;
-    case 9:
-      return rgb(255, 105, 180);
-      break;
-        default: return reset;
+    case -1: return rgb(0, 0, 0);       break;
+    case 0:  return rgb(255, 0, 0);     break;
+    case 1:  return  rgb(255, 165, 0);  break;
+    case 2:  return rgb(255, 255, 0);   break;
+    case 3:  return rgb(144, 238, 144); break;
+    case 4:  return rgb(0, 100, 0);     break;
+    case 5:  return rgb(0, 255, 255);   break;
+    case 6:  return rgb(70, 130, 180);  break;
+    case 7:  return rgb(30, 70, 200);   break;
+    case 8:  return rgb(148, 0, 211);   break;
+    case 9:  return rgb(255, 105, 180); break;
+    default: return reset;
   }
 }
 
-int test_board[9][6] = {
-    {9, 9, 1, 1, 3, -2},
-    {9, 9, 9, 4, 4, 3},
-    {9, 5, 0, 4, 3, -2},
-    {-1, 5, 0, 0, 4, 3},
-    {8, 5, 0, 2, 3, -2},
-    {8, 8, 5, 2, 2, 2},
-    {8, 5, 6, 6, 2, -2},
-    {8, 8, 6, 6, 6, 7},
-    {8, -1, 6, 7, 7, -2}
-};
 
 // -1 is empty and -2 is undefined
 int the_board[9][6] = {
@@ -117,244 +84,6 @@ int the_board[9][6] = {
     {-1, -1, -1, -1, -1, -2}
 };
 
-
-
-int zero1[5][3] = {
-    {0,-1,-1},
-    {0,0,-1},
-    {0,-1,-1},
-    {-1,-1,-1},
-    {-1,-1,-1}
-};
-
-int one1[5][3] = {
-    {1,1,-1},
-    {-1,-1,-1},
-    {-1,-1,-1},
-    {-1,-1,-1},
-    {-1,-1,-1}
-};
-
-int one2[5][3] = {
-    {-1,-1,-1},
-    {1,-1,-1},
-    {-1,-1,-1},
-    {1,-1,-1},
-    {-1,-1,-1}
-};
-
-int two1[5][3] = {
-    {2,-1,-1},
-    {2,2,2},
-    {-1,2,-1},
-    {-1,-1,-1},
-    {-1,-1,-1}
-};
-
-int two2[5][3] = {
-    {2,-1,-1},
-    {-1,2,-1},
-    {2,-1,-1},
-    {2,-1,-1},
-    {2,-1,-1}
-};
-
-int three1[5][3] = {
-    {3,-1,-1},
-    {-1,3,-1},
-    {3,-1,-1},
-    {-1,3,-1},
-    {3,-1,-1}
-};
-
-int three2[5][3] = {
-    {-1,-1,-1},
-    {3,3,3},
-    {3,3,-1},
-    {-1,-1,-1},
-    {-1,-1,-1}
-};
-
-int three3[5][3] = {
-    {3,-1,-1},
-    {3,-1,-1},
-    {3,-1,-1},
-    {3,-1,-1},
-    {3,-1,-1}
-};
-
-int three4[5][3] = {
-    {3,3,-1},
-    {3,3,3},
-    {-1,-1,-1},
-    {-1,-1,-1},
-    {-1,-1,-1}
-};
-
-
-int four1[5][3] = {
-    {-1,-1,-1},
-    {4,4,-1},
-    {4,-1,-1},
-    {-1,4,-1},
-    {-1,-1,-1}
-};
-
-int four2[5][3] = {
-    {4,4,-1},
-    {-1,4,-1},
-    {4,-1,-1},
-    {-1,-1,-1},
-    {-1,-1,-1}
-};
-
-int four3[5][3] = {
-    {-1,-1,-1},
-    {4,-1,-1},
-    {4,-1,-1},
-    {4,4,-1},
-    {-1,-1,-1}
-};
-
-int four4[5][3] = {
-    {-1,4,-1},
-    {-1,4,-1},
-    {4,4,-1},
-    {-1,-1,-1},
-    {-1,-1,-1}
-};
-
-int five1[5][3] = {
-    {5,-1,-1},
-    {5,-1,-1},
-    {5,-1,-1},
-    {-1,5,-1},
-    {5,-1,-1}
-};
-
-int five2[5][3] = {
-    {-1,5,-1},
-    {5,5,5},
-    {5,-1,-1},
-    {-1,-1,-1},
-    {-1,-1,-1}
-};
-
-
-int six1[5][3] = {
-    {6,-1,-1},
-    {6,-1,-1},
-    {6,-1,-1},
-    {6,6,-1},
-    {6,-1,-1}
-};
-
-int six2[5][3] = {
-    {-1,6,-1},
-    {6,6,6},
-    {6,6,-1},
-    {-1,-1,-1},
-    {-1,-1,-1}
-};
-
-int six3[5][3] = {
-    {6,-1,-1},
-    {6,6,-1},
-    {6,-1,-1},
-    {-1,6,-1},
-    {6,-1,-1}
-};
-
-int six4[5][3] = {
-    {6,6,-1},
-    {6,6,6},
-    {6,-1,-1},
-    {-1,-1,-1},
-    {-1,-1,-1}
-};
-
-
-int seven1[5][3] = {
-    {7,-1,-1},
-    {-1,7,-1},
-    {-1,-1,-1},
-    {-1,7,-1},
-    {-1,-1,-1}
-};
-
-int seven2[5][3] = {
-    {7,7,-1},
-    {7,-1,-1},
-    {-1,-1,-1},
-    {-1,-1,-1},
-    {-1,-1,-1}
-};
-
-int seven3[5][3] = {
-    {-1,-1,-1},
-    {7,-1,-1},
-    {-1,-1,-1},
-    {7,-1,-1},
-    {7,-1,-1}
-};
-
-int seven4[5][3] = {
-    {-1,-1,-1},
-    {-1,-1,7},
-    {7,7,-1},
-    {-1,-1,-1},
-    {-1,-1,-1}
-};
-
-int eight1[5][3] = {
-    {8,-1,-1},
-    {8,8,-1},
-    {8,-1,-1},
-    {8,8,-1},
-    {8,-1,-1}
-};
-
-int eight2[5][3] = {
-    {8,8,-1},
-    {8,8,8},
-    {8,8,-1},
-    {-1,-1,-1},
-    {-1,-1,-1}
-};
-
-int nine1[5][3] = {
-    {9,-1,-1},
-    {9,-1,-1},
-    {9,-1,-1},
-    {9,9,-1},
-    {9,-1,-1}
-};
-
-int nine2[5][3] = {
-    {-1,9,-1},
-    {9,9,9},
-    {9,9,-1},
-    {-1,-1,-1},
-    {-1,-1,-1}
-};
-
-int nine3[5][3] = {
-    {9,-1,-1},
-    {9,9,-1},
-    {9,-1,-1},
-    {-1,9,-1},
-    {9,-1,-1}
-};
-
-int nine4[5][3] = {
-    {9,9,-1},
-    {9,9,9},
-    {9,-1,-1},
-    {-1,-1,-1},
-    {-1,-1,-1}
-};
-
-//int rotations[10] = {1,2, 2, 4, 4, 2, 4, 4, 2, 4};
 
 
 // storage for the numbers, 10 numbers * 4 rotations * 5x3 size of the 7 segment display with 5 rows (3 vertical and 2 horizontal) and 3 columns
@@ -372,8 +101,57 @@ void init_numbers() {
         numbers[number, 0, 4, 0] = (digit_segments[number] & G) == 0 ? -1 : number;
 
         for (int rotation = 1; rotation < rotations[number]; rotation++) {
-            // TODO: handle rotations
+          // first convert array into a 2d representation of the two neighboring
+          // 7-segment parts
+            vector<vector<int>> temp(5, vector<int>(5, 0));
+            // convert horizontal segments
+            for (int row = 0; row < 5; row+=2) {
+                for (int col = 0; col < 2; col++) {
+                    if (numbers[number, rotation-1, row, col] > -1) temp[row][2*col+1] = 1;
+              }
+            }
+            // cvonert vertical segments
+            for (int row = 1; row < 5; row+=2) {
+                for (int col = 0; col < 3; col++) {
+                    if (numbers[number, rotation-1, row, col] > -1) temp[row][2*col] = 1;
+              }
+            }
+            // first transpose array
+            for (int i = 0; i < 5; i++) {
+                for (int j = i + 1; j < 5; j++) {
+                    swap(temp[i][j], temp[j][i]);
+                }
+            }
+            // then reverse each row
+            for (int i = 0; i < 5; i++) {
+                reverse(temp[i].begin(), temp[i].end());
+            }
 
+            // now check if first two rows are zero and if yes, rotate them to the
+            // end
+            if (all_of(temp[0].begin(), temp[0].end(), [](int x) { return x == 0; }) && all_of(temp[1].begin(), temp[1].end(), [](int x) { return x == 0; })) {
+                    rotate(temp.begin(), temp.begin() + 2, temp.end());
+            }
+
+            // now check if the first two columns are  zero and if that is the case, rotate them to the back
+            if (all_of(temp.begin(), temp.end(),   [](const std::vector<int> &row) { return row[0] == 0 && row[1] == 0; })) {
+                for (auto& row : temp) {
+                    rotate(row.begin(), row.begin() + 2, row.end());
+                }
+            }
+
+            // convert back into compressed version, first horizontal segments
+            for (int row = 0; row < 5; row+=2) {
+                for (int col = 0; col < 2; col++) {
+                    if (temp[row][2*col+1] == 1) numbers[number, rotation, row, col] = number;
+              }
+            }
+            // now vertical segments
+            for (int row = 1; row < 5; row+=2) {
+                for (int col = 0; col < 3; col++) {
+                    if (temp[row][2*col] == 1) numbers[number, rotation, row, col] = number;
+              }
+            }
         }
     }
 }
@@ -386,41 +164,6 @@ bool place_number(int number, int rotation, int row, int column) {
     if (rotation >= rotations[number])
         return false;
 
-    int (*narr)[5][3];
-
-    int value = number * 10 + rotation;
-    switch (value) {
-        case 00: narr = &zero1; break;
-        case 10: narr = &one1; break;
-        case 11: narr = &one2; break;
-        case 20: narr = &two1; break;
-        case 21: narr = &two2; break;
-        case 30: narr = &three1; break;
-        case 31: narr = &three2; break;
-        case 32: narr = &three3; break;
-        case 33: narr = &three4; break;
-        case 40: narr = &four1; break;
-        case 41: narr = &four2; break;
-        case 42: narr = &four3; break;
-        case 43: narr = &four4; break;
-        case 50: narr = &five1; break;
-        case 51: narr = &five2; break;
-        case 60: narr = &six1; break;
-        case 61: narr = &six2; break;
-        case 62: narr = &six3; break;
-        case 63: narr = &six4; break;
-        case 70: narr = &seven1; break;
-        case 71: narr = &seven2; break;
-        case 72: narr = &seven3; break;
-        case 73: narr = &seven4; break;
-        case 80: narr = &eight1; break;
-        case 81: narr = &eight2; break;
-        case 90: narr = &nine1; break;
-        case 91: narr = &nine2; break;
-        case 92: narr = &nine3; break;
-        case 93: narr = &nine4; break;
-        default: return false;
-    }
 
     // first check if there is no conflict in placing the number
     for (auto i = 0; i < 5; i++) {
@@ -428,12 +171,12 @@ bool place_number(int number, int rotation, int row, int column) {
             int ii = 2 * row + i;
             int jj = column + j;
             if (ii < 9 && jj < 6) {  // we are within the array
-                if ((*narr)[i][j] > -1 && the_board[ii][jj] != -1) { // board is not empty when trying to put number
+                if (numbers[number, rotation, i, j] > -1 && the_board[ii][jj] != -1) { // board is not empty when trying to put number
                     success = false;
                     break;
                 }
             } else { // we are outside the board
-                if ((*narr)[i][j] != -1) {
+                if (numbers[number, rotation, i, j] != -1) {
                     success = false;
                     break;
                 }
@@ -449,8 +192,8 @@ bool place_number(int number, int rotation, int row, int column) {
                 int ii = 2 * row + i;
                 int jj = column + j;
                 if (ii < 9 && jj < 6) {  // we are within the array
-                    if ((*narr)[i][j] != -1 && the_board[ii][jj] == -1) { //
-                        the_board[ii][jj] = (*narr)[i][j];
+                    if (numbers[number, rotation, i, j] != -1 && the_board[ii][jj] == -1) { //
+                        the_board[ii][jj] = numbers[number, rotation, i, j];
                     }
                 }
             }
@@ -513,15 +256,9 @@ void find_solutions(int number) {
 }
 
 
-int main() {
-    // find_solutions(0);
-    init_numbers();
-    for (int i = 0; i < 5; i++) {
-        for (int j = 0; j < 3; j++) {
-            cout << numbers[9,0,i,j] << " ";
-        }
-        cout << endl;
+int main(int argc, char* argv[]) {
 
-    }
+    init_numbers();
+    find_solutions(0);
 
 }
