@@ -246,9 +246,9 @@ void find_solutions(int number) {
                 bool success = place_number(number, rotation, row, col);
                 if (success) {
                     find_solutions(number+1);  // try to put next number
+                    // remove number before trying to place next number
+                    remove_number(number);
                 }
-                // remove number before trying to place next number
-                remove_number(number);
             }
         }
 
